@@ -16,7 +16,8 @@ router.post('/new', [
 // Login de usuario
 router.post('/', [
     check('email', 'El email es obligatorio').isEmail(),
-    check('password', 'La contraseña es obligatoria').isLength({ min: 6 })
+    check('password', 'La contraseña es obligatoria').isLength({ min: 6 }),
+    validarCampos
 ], loginUsuario);
 
 // Validar y revalidar token
