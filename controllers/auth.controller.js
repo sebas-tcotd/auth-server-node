@@ -44,25 +44,57 @@ const crearUsuario = async (req, res = response) => {
             msg: 'Algo salió mal, hable con el administrador.',
         });
     }
-
-
-
-
 }
 
-const loginUsuario = (req, res = response) => {
+const loginUsuario = async (req, res = response) => {
     const { email, password } = req.body;
 
-    return res.json({
-        ok: true,
-        msg: 'Login de usuario /new',
-    })
+    try {
+        const userDB = await Usuario.findOne({ email });
+
+        if (!userDB) {
+            res.status(400).json({
+                ok: false,
+                msg: 'El correo no existe'
+            });
+        }
+
+        // Confirmar si el password hace match
+        const validPassword = bcrypt.compareSync(password, userDB.password);
+
+        if (!validPassword) {
+            res.status(400).json({
+                ok: false,
+                msg: 'El password no es válido'
+            });
+        }
+
+        // Generación del JWT
+        const token = await generateJWT(userDB.id, userDB.name);
+
+        // Respuesta del servicio
+        return res.json({ ok: true, uid: userDB.id, name: userDB.name, token })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Ocurrió un error, hable con el administrador.'
+        })
+    }
 }
 
-const revalidarToken = (req, res = response) => {
+const revalidarToken = async (req, res = response) => {
+
+    const { uid, name } = req;
+
+    const token = await generateJWT(uid, name)
+
     res.json({
         ok: true,
-        msg: 'Renew',
+        uid,
+        name,
+        token
     })
 }
 
