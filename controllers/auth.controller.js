@@ -53,7 +53,7 @@ const loginUsuario = async (req, res = response) => {
         const userDB = await Usuario.findOne({ email });
 
         if (!userDB) {
-            res.status(400).json({
+            return res.status(400).json({
                 ok: false,
                 msg: 'El correo no existe'
             });
@@ -63,7 +63,7 @@ const loginUsuario = async (req, res = response) => {
         const validPassword = bcrypt.compareSync(password, userDB.password);
 
         if (!validPassword) {
-            res.status(400).json({
+            return res.status(400).json({
                 ok: false,
                 msg: 'El password no es válido'
             });
@@ -90,7 +90,7 @@ const revalidarToken = async (req, res = response) => {
 
     const token = await generateJWT(uid, name)
 
-    res.json({
+    return res.json({
         ok: true,
         uid,
         name,
